@@ -18,7 +18,7 @@ static long seed = std::chrono::system_clock::now().time_since_epoch().count();
 static std::default_random_engine generator (seed);
 static std::normal_distribution<double> distribution (0.0,1.0);
 
-static const size_t N = 10;
+static const size_t N = 40;
 static const size_t DIM = 2*N + 2;
 static const double binDelimiter = -1234567891.0;
 
@@ -77,7 +77,7 @@ void stateInit(double y[DIM], double val)
     }
 }
 
-void addTemperatures(const double y[DIM], std::vector<double>& target, double time)
+void addTemperatures (const double y[DIM], std::vector<double>& target)
 {
     for (size_t j = 0; j < N; ++j)
     {
@@ -85,7 +85,7 @@ void addTemperatures(const double y[DIM], std::vector<double>& target, double ti
     }
 }
 
-void makeTProfile(double step, size_t steps, double params[4], double y[DIM], std::vector<double>& target)
+void makeTProfile(double step, size_t steps, double *params, double *y, std::vector<double>& target)
 {
     gsl_odeiv2_system sys = {systemFunc, nullptr, DIM, params};
     gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, 1e-6, 0.0, 1e-3);
@@ -104,7 +104,41 @@ void makeTProfile(double step, size_t steps, double params[4], double y[DIM], st
             break;
         }
         target.push_back(t1);
-        addTemperatures(y, accumulate, t1);
+        addTemperatures(y, accumulate);
+        std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
+                [t1, step](double x){return step*x/t1;});
+        target.push_back(binDelimiter);
+    }
+}
+
+void addFluxes (const double y[DIM], std::vector<double>& target)
+{
+    for (size_t j = 1; j < N-1; ++j)
+    {
+        target[j - 1] += (y[j - 1] - y[j + 1]) * y[j + N + 1] / 2;
+    }
+}
+
+void makeFlux(double step, size_t steps, double *params, double *y, std::vector<double>& target)
+{
+    gsl_odeiv2_system sys = {systemFunc, nullptr, DIM, params};
+    gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, 1e-6, 0.0, 1e-3);
+
+    double t1 = 0;
+
+    std::vector<double> accumulate(N-2, 0);
+
+    for (int t = 0; t < steps; ++t)
+    {
+        std::cout << "Step #" << t << std::endl;
+        int status = gsl_odeiv2_driver_apply (d, &t1, t1 + step, y);
+        if (status != GSL_SUCCESS)
+        {
+            std::cerr << "error, return value=" << status << std::endl;
+            break;
+        }
+        target.push_back(t1);
+        addFluxes(y, accumulate);
         std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
                 [t1, step](double x){return step*x/t1;});
         target.push_back(binDelimiter);

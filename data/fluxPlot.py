@@ -19,7 +19,7 @@ def myMin(array2d):
     return c
 
 
-data = np.fromfile('tProfile40.bin')
+data = np.fromfile('flux10.bin')
 binDelimiter = -1234567891
 
 T = []
@@ -42,26 +42,22 @@ for entry in data:
 fig = plt.figure()
 yMax = myMax(T)
 yMin = myMin(T)
-xMin = 0
-xMax = len(T[0]) - 1
+xMin = min(time)
+xMax = max(time)
 ax = fig.subplots(subplot_kw=dict(aspect='auto', autoscale_on=False, xlim=(xMin, xMax), ylim=(yMin, yMax)))
 ax.grid()
 
-image = ax.plot([], [], '.')[0]
-text = ax.text(.02, .95, '', transform=ax.transAxes)
+T = np.transpose(T)
+Tm = np.mean(T, axis=0)
+
+lines = []
+for t in T:
+    line = ax.plot(time, t, '-.', lw=.5)[0]
+    lines.append(line)
+lines.append(ax.plot(time, Tm, '-k')[0])
 
 indices = []
 for n, t in enumerate(T[0]):
     indices.append(n);
 
-
-def animate(i):
-    image.set_data(indices, T[i])
-    text.set_text('$time$ = %.2f' % time[i])
-    return image, text,
-
-
-ani = animation.FuncAnimation(fig, animate, frames=len(T), interval=40, blit=True)
-
-# ani.save('../report/RENAME.gif', writer='imagemagick', fps=25)
 plt.show()

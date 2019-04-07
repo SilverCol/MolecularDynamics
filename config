@@ -5,6 +5,6 @@
 -lambda=0.0
 
 # Propagation parameters
--steps=1000
--step=30
+-steps=10000
+-step=300
 
