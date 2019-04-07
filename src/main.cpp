@@ -1,8 +1,7 @@
 #include <gflags/gflags.h>
 #include "experiments.hpp"
 
-DEFINE_int32(N, 20, "Number of qbits.");
-DEFINE_int32(Np, 100, "Number of random states.");
+DEFINE_int32(N, 50, "Number of particles.");
 
 DEFINE_int32(M, 100, "Number of propagation steps.");
 DEFINE_int32(steps, 1, "Number invisible steps inbetween.");
