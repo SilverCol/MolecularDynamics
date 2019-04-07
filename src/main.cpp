@@ -1,18 +1,17 @@
 #include <gflags/gflags.h>
 #include "experiments.hpp"
 
-DEFINE_int32(N, 50, "Number of particles.");
+DEFINE_double(relax, 1.0, "Inverse relaxation time.");
+DEFINE_double(tl, 1.0, "Left thermostat.");
+DEFINE_double(tr, 2.0, "Right thermostat.");
+DEFINE_double(lambda, 1.0, "Anharmonic constant.");
 
-DEFINE_int32(M, 100, "Number of propagation steps.");
-DEFINE_int32(steps, 1, "Number invisible steps inbetween.");
-DEFINE_double(z, .03, "Propagation step coefficient.");
-DEFINE_int32(scheme, 2, "Number of split-step scheme as S{scheme} (eg. 2 for S2).");
+DEFINE_int32(steps, 1000, "Number of time steps.");
+DEFINE_double(step, .03, "Time step.");
 
 DEFINE_string(file, "../data/a.txt", "Path for the output file.");
 
-DEFINE_int32(mode, 0, "Operation mode: 0-phaseSum, 1-localSpin, 2-spinFlux");
-
-DEFINE_int32(j, 0, "Spin index, for local spin correlation");
+DEFINE_int32(mode, 0, "Operation mode: 0-TProfile");
 
 int main(int argc, char* argv[])
 {
@@ -20,11 +19,17 @@ int main(int argc, char* argv[])
 
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
+    double params[4] = {FLAGS_relax, FLAGS_tl, FLAGS_tr, FLAGS_lambda};
+
+    double y[DIM];
+    stateInit(y);
+
     std::vector<double> output;
     switch(FLAGS_mode)
     {
-        case 0: // mode
-            std::cout << "Calculating ..." << std::endl;
+        case 0: // T profile mode
+            std::cout << "Calculating T profile" << std::endl;
+            makeTProfile(FLAGS_step, FLAGS_steps, params, y, output);
            break;
         default:
             std::cerr << "Invalid mode." << std::endl;

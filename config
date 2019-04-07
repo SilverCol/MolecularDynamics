@@ -1,2 +1,10 @@
-# Number of qbits
--N=8
+# System parameters
+-relax=1.0
+-tl=1.0
+-tr=2.0
+-lambda=1.0
+
+# Propagation parameters
+-steps=1000
+-step=.03
+

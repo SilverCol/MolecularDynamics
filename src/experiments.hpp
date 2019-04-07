@@ -13,6 +13,7 @@
 #include <gsl/gsl_odeiv2.h>
 
 static const size_t N = 50;
+static const size_t DIM = 2*N + 2;
 static const double binDelimiter = -1234567891.0;
 
 void writeBinary(std::vector<double>& data, const std::string& file)
@@ -52,7 +53,12 @@ int systemFunc(double t, const double y[], double f[], void * params)
     return GSL_SUCCESS;
 }
 
-void addTemperatures(const double y[N], std::vector<double>& target)
+void stateInit(double y[DIM])
+{
+    for (size_t j = 0; j < DIM; ++j) y[j] = 0;
+}
+
+void addTemperatures(const double y[DIM], std::vector<double>& target)
 {
     for (size_t j = N + 1; j < 2*N + 1; ++j)
     {
@@ -60,9 +66,9 @@ void addTemperatures(const double y[N], std::vector<double>& target)
     }
 }
 
-void makeTProfile(double step, size_t steps, double params[4], double y[N], std::vector<double>& target)
+void makeTProfile(double step, size_t steps, double params[4], double y[DIM], std::vector<double>& target)
 {
-    gsl_odeiv2_system sys = {systemFunc, nullptr, 2, params};
+    gsl_odeiv2_system sys = {systemFunc, nullptr, DIM, params};
     gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, 1e-6, 0.0, 1e-6);
 
     double t1 = 0;
