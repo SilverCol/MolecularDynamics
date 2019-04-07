@@ -9,8 +9,11 @@
 #include <chrono>
 #include <fstream>
 #include <cmath>
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_odeiv2.h>
 
 static const size_t N = 50;
+static const double binDelimiter = -1234567891.0;
 
 void writeBinary(std::vector<double>& data, const std::string& file)
 {
@@ -45,6 +48,43 @@ int systemFunc(double t, const double y[], double f[], void * params)
 
     f[2*N] = -2 * y[N - 1] - 4 * lambda * pow(y[N - 1], 3) + y[N - 2] - y[2*N + 1] * y[2*N];
     f[2*N + 1] = relax * (y[2*N] * y[2*N] - tr);
+
+    return GSL_SUCCESS;
+}
+
+void addTemperatures(const double y[N], std::vector<double>& target)
+{
+    for (size_t j = N + 1; j < 2*N + 1; ++j)
+    {
+        target.push_back(y[j] * y[j] / 2);
+    }
+}
+
+void makeTProfile(double step, size_t steps, double params[4], double y[N], std::vector<double>& target)
+{
+    gsl_odeiv2_system sys = {systemFunc, nullptr, 2, params};
+    gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, 1e-6, 0.0, 1e-6);
+
+    double t1 = 0;
+    double t2 = step;
+
+    target.push_back(t1);
+    addTemperatures(y, target);
+    target.push_back(binDelimiter);
+
+    for (int t = 0; t < steps; ++t)
+    {
+        int status = gsl_odeiv2_driver_apply (d, &t1, t2, y);
+        if (status != GSL_SUCCESS)
+        {
+            std::cerr << "error, return value=" << status << std::endl;
+            break;
+        }
+        t2 += step;
+        target.push_back(t1);
+        addTemperatures(y, target);
+        target.push_back(binDelimiter);
+    }
 }
 
 #endif //VAJA_II_2_EXPERIMENTS_HPP
