@@ -21,6 +21,7 @@ int main(int argc, char* argv[])
 
     double params[4] = {FLAGS_relax, FLAGS_tl, FLAGS_tr, FLAGS_lambda};
 
+    // TODO move those inside function
     double y[DIM];
     stateInit(y);
 

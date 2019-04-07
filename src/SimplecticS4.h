@@ -9,6 +9,7 @@
 
 class SimplecticS4
 {
+public:
     SimplecticS4(double tau, double lambda);
     void propagate(std::vector<double>& x, size_t steps);
 private:
