@@ -19,7 +19,7 @@ def myMin(array2d):
     return c
 
 
-data = np.fromfile('tProfile.bin')
+data = np.fromfile('tProfileAnimation10.bin')
 binDelimiter = -1234567891
 
 T = []
@@ -42,15 +42,12 @@ for entry in data:
 fig = plt.figure()
 yMax = myMax(T)
 yMin = myMin(T)
-margin = .05 * (yMax - yMin)
-yMax += margin
-yMin -= margin
 xMin = 0
 xMax = len(T[0])
-ax = fig.subplots(subplot_kw=dict(aspect='equal', autoscale_on=False, xlim=(xMin, xMax), ylim=(yMin, yMax)))
+ax = fig.subplots(subplot_kw=dict(aspect='auto', autoscale_on=False, xlim=(xMin, xMax), ylim=(yMin, yMax)))
 ax.grid()
 
-image = ax.plot([], [], ',')[0]
+image = ax.plot([], [], '.')[0]
 text = ax.text(.02, .95, '', transform=ax.transAxes)
 
 indices = []

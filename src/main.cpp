@@ -11,7 +11,7 @@ DEFINE_double(step, .03, "Time step.");
 
 DEFINE_string(file, "../data/a.txt", "Path for the output file.");
 
-DEFINE_int32(mode, 0, "Operation mode: 0-TProfile");
+DEFINE_int32(mode, 0, "Operation mode: 0-TProfileAnimation");
 
 int main(int argc, char* argv[])
 {
@@ -27,8 +27,9 @@ int main(int argc, char* argv[])
     std::vector<double> output;
     switch(FLAGS_mode)
     {
-        case 0: // T profile mode
+        case 0: // T profile animation mode
             std::cout << "Calculating T profile" << std::endl;
+            FLAGS_file.append(std::to_string(N));
             makeTProfile(FLAGS_step, FLAGS_steps, params, y, output);
            break;
         default:

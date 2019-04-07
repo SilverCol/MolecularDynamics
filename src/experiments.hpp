@@ -7,12 +7,18 @@
 
 #include <iostream>
 #include <chrono>
+#include <random>
 #include <fstream>
 #include <cmath>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_odeiv2.h>
+#include <algorithm>
 
-static const size_t N = 50;
+static long seed = std::chrono::system_clock::now().time_since_epoch().count();
+static std::default_random_engine generator (seed);
+static std::normal_distribution<double> distribution (0.0,1.0);
+
+static const size_t N = 10;
 static const size_t DIM = 2*N + 2;
 static const double binDelimiter = -1234567891.0;
 
@@ -55,40 +61,52 @@ int systemFunc(double t, const double y[], double f[], void * params)
 
 void stateInit(double y[DIM])
 {
-    for (size_t j = 0; j < DIM; ++j) y[j] = 0;
+    for (size_t j = 0; j < DIM; ++j)
+    {
+        if (j > N && j <= 2*N) y[j] = distribution(generator);
+        else y[j] = 0;
+    }
 }
 
-void addTemperatures(const double y[DIM], std::vector<double>& target)
+void stateInit(double y[DIM], double val)
 {
-    for (size_t j = N + 1; j < 2*N + 1; ++j)
+    for (size_t j = 0; j < DIM; ++j)
     {
-        target.push_back(y[j] * y[j] / 2);
+        if (j > N && j <= 2*N) y[j] = val;
+        else y[j] = 0;
+    }
+}
+
+void addTemperatures(const double y[DIM], std::vector<double>& target, double time)
+{
+    for (size_t j = 0; j < N; ++j)
+    {
+        target[j] += y[j + N + 1] * y[j + N + 1] / 2;
     }
 }
 
 void makeTProfile(double step, size_t steps, double params[4], double y[DIM], std::vector<double>& target)
 {
     gsl_odeiv2_system sys = {systemFunc, nullptr, DIM, params};
-    gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, 1e-6, 0.0, 1e-6);
+    gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, 1e-6, 0.0, 1e-3);
 
     double t1 = 0;
-    double t2 = step;
 
-    target.push_back(t1);
-    addTemperatures(y, target);
-    target.push_back(binDelimiter);
+    std::vector<double> accumulate(N, 0);
 
     for (int t = 0; t < steps; ++t)
     {
-        int status = gsl_odeiv2_driver_apply (d, &t1, t2, y);
+        std::cout << "Step #" << t << std::endl;
+        int status = gsl_odeiv2_driver_apply (d, &t1, t1 + step, y);
         if (status != GSL_SUCCESS)
         {
             std::cerr << "error, return value=" << status << std::endl;
             break;
         }
-        t2 += step;
         target.push_back(t1);
-        addTemperatures(y, target);
+        addTemperatures(y, accumulate, t1);
+        std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
+                [t1, step](double x){return step*x/t1;});
         target.push_back(binDelimiter);
     }
 }

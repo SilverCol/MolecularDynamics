@@ -1,10 +1,10 @@
 # System parameters
--relax=1.0
+-relax=.02
 -tl=1.0
 -tr=2.0
--lambda=1.0
+-lambda=0.0
 
 # Propagation parameters
 -steps=1000
--step=.03
+-step=30
 
