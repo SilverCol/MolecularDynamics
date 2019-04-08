@@ -6,9 +6,9 @@ DEFINE_double(tl, 1.0, "Left thermostat.");
 DEFINE_double(tr, 2.0, "Right thermostat.");
 DEFINE_double(lambda, 1.0, "Anharmonic constant.");
 
-DEFINE_int32(samples, 1000, "Number of tau steps.");
-DEFINE_int32(reads, 10, "Number of reads between tau steps.");
-DEFINE_int32(steps, 1, "Number of steps between reads.");
+DEFINE_int32(reads, 1000, "Number of reads for output file.");
+DEFINE_int32(samples, 1000, "Number of tau steps between reads (maxwell).");
+DEFINE_int32(steps, 1, "Number of steps between reads (or inside sample for maxwell).");
 DEFINE_double(step, .03, "Time step (a.k.a. tau for maxwell).");
 
 DEFINE_string(file, "../data/a.txt", "Path for the output file.");
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
         case 2: // maxwell T profile mode
             std::cout << "Calculating T profile (maxwell)" << std::endl;
             FLAGS_file.append(std::to_string(N));
-            maxwelTProfile(FLAGS_step, FLAGS_samples, FLAGS_reads, FLAGS_steps,  FLAGS_lambda, tl, tr, output);
+            maxwelTProfile(FLAGS_step, FLAGS_reads, FLAGS_samples, FLAGS_steps, FLAGS_lambda, tl, tr, output);
             break;
         default:
             std::cerr << "Invalid mode." << std::endl;

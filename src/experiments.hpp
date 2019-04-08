@@ -145,37 +145,39 @@ void makeFlux(double step, size_t steps, double *params, double *y, std::vector<
     }
 }
 
-void maxwelTProfile(double tau, size_t samples, size_t reads, size_t steps, double lambda,
-        std::normal_distribution<double>& tl, std::normal_distribution<double>& tr, std::vector<double>& target)
+void maxwelTProfile(double tau, size_t reads, size_t samples, size_t steps, double lambda,
+                    std::normal_distribution<double>& tl, std::normal_distribution<double>& tr,
+                    std::vector<double>& target)
 {
-    SimplecticS4 integrator(tau / (reads * steps), lambda);
+    SimplecticS4 integrator(tau / steps, lambda);
     std::vector<double> x(2*N, 0);
     stateInit(x);
 
     double time = 0;
-    double readStep = tau / reads;
+    double readStep = tau * samples;
     std::vector<double> accumulate(N, 0);
 
-    for (size_t sample = 0; sample < samples; ++sample)
+    for (size_t read = 0; read < reads; ++read)
     {
-        std::cout << "Sample #" << sample << std::endl;
+        std::cout << "Read #" << read << std::endl;
 
-        for (size_t read = 0; read < reads; ++read)
+        for (size_t sample = 0; sample < samples; ++sample)
         {
             integrator.propagate(x, steps);
-            time += readStep;
 
-            target.push_back(time);
-            std::transform(accumulate.begin(), accumulate.end(), x.begin() + N, accumulate.begin(),
-                           [](double acc, double x){return acc + x*x/2;});
-            std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
-                           [time, readStep](double x){return readStep*x/time;});
-
-            target.push_back(binDelimiter);
+            x[N] = tl(generator);
+            x[2*N - 1] = tr(generator);
         }
 
-        x[N] = tl(generator);
-        x[2*N - 1] = tr(generator);
+        time += readStep;
+        target.push_back(time);
+
+        std::transform(accumulate.begin(), accumulate.end(), x.begin() + N, accumulate.begin(),
+                       [](double acc, double x){return acc + x*x/2;});
+        std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
+                       [time, readStep](double x){return readStep*x/time;});
+
+        target.push_back(binDelimiter);
     }
 }
 
