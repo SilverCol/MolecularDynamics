@@ -75,6 +75,7 @@ void maxwellInit(std::vector<double>& x)
     }
 }
 
+// TODO there must be a bug in here
 void makeTProfile(double step, size_t steps, double *params, std::vector<double>& target, std::vector<double>& x)
 {
     gsl_odeiv2_system sys = {systemFunc, nullptr, x.size(), params};
@@ -109,6 +110,14 @@ void addFluxes (const std::vector<double>& y, std::vector<double>& target, size_
     for (size_t j = 1; j < N-1; ++j)
     {
         target[j - 1] += (y[j - 1] - y[j + 1]) * y[j + N + 1] / 2;
+    }
+}
+
+void maxwellFluxes (const std::vector<double>& y, std::vector<double>& target, size_t N)
+{
+    for (size_t j = 1; j < N-1; ++j)
+    {
+        target[j - 1] += (y[j - 1] - y[j + 1]) * y[j + N] / 2;
     }
 }
 
@@ -174,5 +183,38 @@ void maxwelTProfile(double tau, size_t reads, size_t samples, size_t steps, doub
     }
 }
 
+void maxwelFlux(double tau, size_t reads, size_t samples, size_t steps, double lambda,
+                    std::normal_distribution<double>& tl, std::normal_distribution<double>& tr,
+                    std::vector<double>& target, std::vector<double>& x)
+{
+    SimplecticS4 integrator(tau / steps, lambda);
+    size_t N = x.size()/2;
+
+    double time = 0;
+    double readStep = tau * samples;
+    std::vector<double> accumulate(N - 2, 0);
+
+    for (size_t read = 0; read < reads; ++read)
+    {
+        std::cout << "Read #" << read << std::endl;
+
+        for (size_t sample = 0; sample < samples; ++sample)
+        {
+            integrator.propagate(x, steps);
+
+            x[N] = tl(generator);
+            x[2*N - 1] = tr(generator);
+        }
+
+        time += readStep;
+        target.push_back(time);
+
+        maxwellFluxes(x, accumulate, N);
+        std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
+                       [time, readStep](double x){return readStep*x/time;});
+
+        target.push_back(binDelimiter);
+    }
+}
 
 #endif //VAJA_II_2_EXPERIMENTS_HPP

@@ -14,7 +14,7 @@ DEFINE_double(step, .03, "Time step (a.k.a. tau for maxwell).");
 
 DEFINE_string(file, "../data/a.txt", "Path for the output file.");
 
-DEFINE_int32(mode, 0, "Operation mode: 0-TProfile, 1-Flux, 2-MTProfile");
+DEFINE_int32(mode, 0, "Operation mode: 0-TProfile, 1-Flux, 2-MTProfile, 3-MFlux");
 
 int main(int argc, char* argv[])
 {
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
             makeTProfile(FLAGS_step * FLAGS_samples, FLAGS_reads, params, output, x);
            break;
         case 1: // flux mode
-            std::cout << "Calculating T profile" << std::endl;
+            std::cout << "Calculating flux" << std::endl;
             FLAGS_file.append(std::to_string(FLAGS_N));
             x.resize(2*FLAGS_N + 2, 0);
             stateInit(x);
@@ -51,6 +51,13 @@ int main(int argc, char* argv[])
             x.resize(2*FLAGS_N, 0);
             maxwellInit(x);
             maxwelTProfile(FLAGS_step, FLAGS_reads, FLAGS_samples, FLAGS_steps, FLAGS_lambda, tl, tr, output, x);
+            break;
+        case 3: // maxwell flux mode
+            std::cout << "Calculating flux (maxwell)" << std::endl;
+            FLAGS_file.append(std::to_string(FLAGS_N));
+            x.resize(2*FLAGS_N, 0);
+            maxwellInit(x);
+            maxwelFlux(FLAGS_step, FLAGS_reads, FLAGS_samples, FLAGS_steps, FLAGS_lambda, tl, tr, output, x);
             break;
         default:
             std::cerr << "Invalid mode." << std::endl;
