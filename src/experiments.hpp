@@ -96,7 +96,7 @@ void makeTProfile(double step, size_t steps, double *params, std::vector<double>
         }
 
         target.push_back(t);
-        std::transform(accumulate.begin(), accumulate.end(), x.begin() + N, accumulate.begin(),
+        std::transform(accumulate.begin(), accumulate.end(), x.begin() + N + 1, accumulate.begin(),
                        [](double acc, double x){return acc + x*x/2;});
         std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
                 [t, step](double x){return step*x/t;});
