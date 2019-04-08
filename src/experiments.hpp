@@ -19,6 +19,7 @@ static long seed = std::chrono::system_clock::now().time_since_epoch().count();
 static std::default_random_engine generator (seed);
 static std::normal_distribution<double> distribution (0.0,1.0);
 
+static const size_t N = 10;
 static const double binDelimiter = -1234567891.0;
 
 void writeBinary(std::vector<double>& data, const std::string& file)
@@ -38,7 +39,6 @@ int systemFunc(double t, const double y[], double f[], void * params)
     double tl = *((double*)params + 1);
     double tr = *((double*)params + 2);
     double lambda = *((double*)params + 3);
-    auto  N = (size_t)*((double*)params + 4);
 
     for (size_t j = 0; j < N; ++j)
     {
@@ -80,32 +80,31 @@ void makeTProfile(double step, size_t steps, double *params, std::vector<double>
 {
     gsl_odeiv2_system sys = {systemFunc, nullptr, x.size(), params};
     gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, 1e-6, 0.0, 1e-3);
-    size_t N = x.size()/2 - 1;
 
-    double t1 = 0;
+    double t = 0;
 
     std::vector<double> accumulate(N, 0);
 
-    for (int t = 0; t < steps; ++t)
+    for (size_t i = 0; i < steps; ++i)
     {
-        std::cout << "Step #" << t << std::endl;
-        int status = gsl_odeiv2_driver_apply (d, &t1, t1 + step, x.data());
+        std::cout << "Step #" << i << std::endl;
+        int status = gsl_odeiv2_driver_apply (d, &t, t + step, x.data());
         if (status != GSL_SUCCESS)
         {
             std::cerr << "error, return value=" << status << std::endl;
             break;
         }
 
-        target.push_back(t1);
+        target.push_back(t);
         std::transform(accumulate.begin(), accumulate.end(), x.begin() + N, accumulate.begin(),
                        [](double acc, double x){return acc + x*x/2;});
         std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
-                [t1, step](double x){return step*x/t1;});
+                [t, step](double x){return step*x/t;});
         target.push_back(binDelimiter);
     }
 }
 
-void addFluxes (const std::vector<double>& y, std::vector<double>& target, size_t N)
+void addFluxes (const std::vector<double>& y, std::vector<double>& target)
 {
     for (size_t j = 1; j < N-1; ++j)
     {
@@ -113,7 +112,7 @@ void addFluxes (const std::vector<double>& y, std::vector<double>& target, size_
     }
 }
 
-void maxwellFluxes (const std::vector<double>& y, std::vector<double>& target, size_t N)
+void maxwellFluxes (const std::vector<double>& y, std::vector<double>& target)
 {
     for (size_t j = 1; j < N-1; ++j)
     {
@@ -125,7 +124,6 @@ void makeFlux(double step, size_t steps, double *params, std::vector<double>& ta
 {
     gsl_odeiv2_system sys = {systemFunc, nullptr, x.size(), params};
     gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, 1e-6, 0.0, 1e-3);
-    size_t N = x.size()/2 - 1;
 
     double t1 = 0;
 
@@ -141,7 +139,7 @@ void makeFlux(double step, size_t steps, double *params, std::vector<double>& ta
             break;
         }
         target.push_back(t1);
-        addFluxes(x, accumulate, N);
+        addFluxes(x, accumulate);
         std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
                 [t1, step](double x){return step*x/t1;});
         target.push_back(binDelimiter);
@@ -153,7 +151,6 @@ void maxwelTProfile(double tau, size_t reads, size_t samples, size_t steps, doub
                     std::vector<double>& target, std::vector<double>& x)
 {
     SimplecticS4 integrator(tau / steps, lambda);
-    size_t N = x.size()/2;
 
     double time = 0;
     double readStep = tau * samples;
@@ -188,7 +185,6 @@ void maxwelFlux(double tau, size_t reads, size_t samples, size_t steps, double l
                     std::vector<double>& target, std::vector<double>& x)
 {
     SimplecticS4 integrator(tau / steps, lambda);
-    size_t N = x.size()/2;
 
     double time = 0;
     double readStep = tau * samples;
@@ -209,7 +205,7 @@ void maxwelFlux(double tau, size_t reads, size_t samples, size_t steps, double l
         time += readStep;
         target.push_back(time);
 
-        maxwellFluxes(x, accumulate, N);
+        maxwellFluxes(x, accumulate);
         std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
                        [time, readStep](double x){return readStep*x/time;});
 

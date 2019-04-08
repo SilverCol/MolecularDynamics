@@ -1,5 +1,4 @@
 # System parameters
--N=10
 -relax=33.3
 -tl=1.0
 -tr=2.0
