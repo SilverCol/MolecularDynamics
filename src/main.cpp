@@ -62,6 +62,7 @@ int main(int argc, char* argv[])
             std::cerr << "Invalid mode." << std::endl;
             return -1;
     }
+    if ((int)FLAGS_lambda != 0) FLAGS_file.append("a");
     FLAGS_file.append(".bin");
     std::cout << "Writting to file: " << FLAGS_file << std::endl;
     writeBinary(output, FLAGS_file);

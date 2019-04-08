@@ -2,7 +2,7 @@
 -relax=33.3
 -tl=1.0
 -tr=2.0
--lambda=0.0
+-lambda=1.0
 
 # Propagation parameters
 -reads=1000

@@ -19,7 +19,19 @@ def myMin(array2d):
     return c
 
 
-data = np.fromfile('flux10.bin')
+txt = input('Maxwell? ')
+if txt == 'y':
+    file = 'mFlux'
+else:
+    file = 'flux'
+txt = input('Number? ')
+file += txt
+txt = input('Anharmonic? ')
+if txt == 'y':
+    file += 'a'
+file += '.bin'
+
+data = np.fromfile(file)
 binDelimiter = -1234567891
 
 T = []
