@@ -19,7 +19,7 @@ def myMin(array2d):
     return c
 
 
-data = np.fromfile('tProfile10.bin')
+data = np.fromfile('mTProfile10.bin')
 binDelimiter = -1234567891
 
 T = []

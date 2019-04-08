@@ -5,6 +5,8 @@
 -lambda=0.0
 
 # Propagation parameters
--steps=10000
--step=300
+-samples=10000
+-reads=1
+-steps=100
+-step=3
 

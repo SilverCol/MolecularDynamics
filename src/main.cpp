@@ -6,12 +6,14 @@ DEFINE_double(tl, 1.0, "Left thermostat.");
 DEFINE_double(tr, 2.0, "Right thermostat.");
 DEFINE_double(lambda, 1.0, "Anharmonic constant.");
 
-DEFINE_int32(steps, 1000, "Number of time steps.");
-DEFINE_double(step, .03, "Time step.");
+DEFINE_int32(samples, 1000, "Number of tau steps.");
+DEFINE_int32(reads, 10, "Number of reads between tau steps.");
+DEFINE_int32(steps, 1, "Number of steps between reads.");
+DEFINE_double(step, .03, "Time step (a.k.a. tau for maxwell).");
 
 DEFINE_string(file, "../data/a.txt", "Path for the output file.");
 
-DEFINE_int32(mode, 0, "Operation mode: 0-TProfile, 1-Flux");
+DEFINE_int32(mode, 0, "Operation mode: 0-TProfile, 1-Flux, 2-MTProfile");
 
 int main(int argc, char* argv[])
 {
@@ -20,6 +22,9 @@ int main(int argc, char* argv[])
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
     double params[4] = {FLAGS_relax, FLAGS_tl, FLAGS_tr, FLAGS_lambda};
+
+    std::normal_distribution<double> tl(0.0, sqrt(FLAGS_tl));
+    std::normal_distribution<double> tr(0.0, sqrt(FLAGS_tr));
 
     // TODO move those inside function
     double y[DIM];
@@ -38,6 +43,11 @@ int main(int argc, char* argv[])
             FLAGS_file.append(std::to_string(N));
             makeFlux(FLAGS_step, FLAGS_steps, params, y, output);
            break;
+        case 2: // maxwell T profile mode
+            std::cout << "Calculating T profile (maxwell)" << std::endl;
+            FLAGS_file.append(std::to_string(N));
+            maxwelTProfile(FLAGS_step, FLAGS_samples, FLAGS_reads, FLAGS_steps,  FLAGS_lambda, tl, tr, output);
+            break;
         default:
             std::cerr << "Invalid mode." << std::endl;
             return -1;

@@ -19,7 +19,7 @@ static long seed = std::chrono::system_clock::now().time_since_epoch().count();
 static std::default_random_engine generator (seed);
 static std::normal_distribution<double> distribution (0.0,1.0);
 
-static const size_t N = 40;
+static const size_t N = 10;
 static const size_t DIM = 2*N + 2;
 static const double binDelimiter = -1234567891.0;
 
@@ -71,19 +71,9 @@ void stateInit(double y[DIM])
 
 void stateInit(std::vector<double>& x)
 {
-    for (size_t j = 0; j < x.size(); ++j)
+    for (size_t j = N; j < x.size(); ++j)
     {
-        if (j >= N) x[j] = distribution(generator);
-        else x[j] = 0;
-    }
-}
-
-void stateInit(double y[DIM], double val)
-{
-    for (size_t j = 0; j < DIM; ++j)
-    {
-        if (j > N && j <= 2*N) y[j] = val;
-        else y[j] = 0;
+        x[j] = distribution(generator);
     }
 }
 
@@ -159,7 +149,7 @@ void maxwelTProfile(double tau, size_t samples, size_t reads, size_t steps, doub
         std::normal_distribution<double>& tl, std::normal_distribution<double>& tr, std::vector<double>& target)
 {
     SimplecticS4 integrator(tau / (reads * steps), lambda);
-    std::vector<double> x;
+    std::vector<double> x(2*N, 0);
     stateInit(x);
 
     double time = 0;
