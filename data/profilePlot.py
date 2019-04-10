@@ -24,10 +24,12 @@ xMax = len(data) - 1
 ax = fig.subplots(subplot_kw=dict(aspect='auto', autoscale_on=False, xlim=(xMin, xMax), ylim=(yMin, yMax)))
 ax.grid()
 
-m = np.mean(data)
-m = [m for val in data]
 
 ax.plot(data, '-o')
-ax.plot(m, '-.')
+
+if txt != 'y':
+    m = np.mean(data)
+    m = [m for val in data]
+    ax.plot(m, '-.')
 
 plt.show()

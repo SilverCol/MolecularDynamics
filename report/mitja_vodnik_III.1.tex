@@ -74,11 +74,18 @@
     \end{equation}
 
     Tu so $q_j$ in $p_j$ posplošene koordinate in impulzi delcev, $\zeta_L$ in $\zeta_R$ pa eksterni spremenljivki, ki
-    delce vežeta s termostatoma. $V(\q)$ v tem sistemu prestavlja celoten potencial, torej:
+    delce vežeta s termostatoma. $V(\q)$ v tem sistemu predstavlja celoten potencial, torej:
 
     \begin{equation}\label{eq4}
         V(\q) = \half \sum_{j=1}^N q_j^2 + \lambda \sum_{j=1}^N q_j^4 + \half \sum_{j=1}^{N-1} (q_{j+1} - q_j)^2
     \end{equation}
+
+    Sistem enačb v tem modelu ni Hamiltonski, zato si ne moremo pomagati s simplektičnimi integratorji - namesto tega
+    uporabljamo metodo Runge-Kutta $4.$ reda.
+
+    \section{Maxwellov model}
+
+    Za razliko od prejšnjega, je ta model toplotnih kopeli stohastičen.
 
     \iffalse
     \begin{figure}

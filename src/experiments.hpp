@@ -18,7 +18,6 @@
 static long seed = std::chrono::system_clock::now().time_since_epoch().count();
 static std::default_random_engine generator (seed);
 static std::normal_distribution<double> distribution (0.0,1.225);
-static std::normal_distribution<double> distribution2 (0.0,0.1);
 
 static const size_t N = 10;
 static const double binDelimiter = -1234567891.0;
@@ -62,10 +61,6 @@ int systemFunc(double t, const double y[], double f[], void * params)
 
 void stateInit(std::vector<double>& x)
 {
-    for (size_t j = 0; j < x.size()/2 - 1; ++j)
-    {
-        x[j] = distribution2(generator);
-    }
     for (size_t j = x.size()/2; j < x.size()-1; ++j)
     {
         x[j] = distribution(generator);
@@ -74,10 +69,6 @@ void stateInit(std::vector<double>& x)
 
 void maxwellInit(std::vector<double>& x)
 {
-    for (size_t j = 0; j < x.size()/2; ++j)
-    {
-        x[j] = distribution2(generator);
-    }
     for (size_t j = x.size()/2; j < x.size(); ++j)
     {
         x[j] = distribution(generator);
