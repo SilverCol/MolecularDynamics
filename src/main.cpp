@@ -12,6 +12,9 @@ DEFINE_int32(steps, 1, "Number of steps inside a sample (maxwell).");
 DEFINE_double(step, .03, "Time step (a.k.a. tau for maxwell).");
 DEFINE_double(cutoff, 10000., "Initial cutoff.");
 
+DEFINE_int32(nTau, 1000, "Number of tau steps.");
+DEFINE_double(dtau, .01, "Tau step.");
+
 DEFINE_string(file, "../data/a.txt", "Path for the output file.");
 
 DEFINE_int32(mode, 0, "Operation mode: 0-TProfile, 1-Flux, 2-MTProfile, 3-MFlux, 4-finalTProfileFrame");
@@ -88,6 +91,13 @@ int main(int argc, char* argv[])
             x.resize(2*N, 0);
             maxwellInit(x);
             fluxMax(FLAGS_step, FLAGS_reads, FLAGS_samples, FLAGS_steps, FLAGS_lambda, tl, tr, output, x);
+            break;
+        case 8:
+            std::cout << "Calculating contact flux (maxwell)" << std::endl;
+            FLAGS_file.append(std::to_string(N));
+            x.resize(2*N, 0);
+            maxwellInit(x);
+            contactFlux(FLAGS_step, FLAGS_dtau, FLAGS_nTau, FLAGS_samples, FLAGS_steps, FLAGS_lambda, tl, tr, output, x);
             break;
         default:
             std::cerr << "Invalid mode." << std::endl;

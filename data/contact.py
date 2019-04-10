@@ -2,11 +2,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import matplotlib.animation as animation
 
-txt = input('Maxwell? ')
-if txt == 'y':
-    file = 'mFluxFrame'
-else:
-    file = 'fluxFrame'
+file = 'contact'
 txt = input('Number? ')
 file += txt
 txt = input('Anharmonic? ')
@@ -16,18 +12,28 @@ file += '.bin'
 
 data = np.fromfile(file)
 
+t = []
+j1 = []
+j2 = []
+for n, entry in enumerate(data):
+    stage = n % 3
+    if stage == 0:
+        t.append(entry)
+    elif stage == 1:
+        j1.append(entry)
+    elif stage == 2:
+        j2.append(entry)
+
 fig = plt.figure()
-yMax = 1.1*max(data)
-yMin = 0
-xMin = 0
-xMax = len(data) - 1
+yMax = .25
+yMin = -.25
+xMin = min(t)
+xMax = max(t)
 ax = fig.subplots(subplot_kw=dict(aspect='auto', autoscale_on=False, xlim=(xMin, xMax), ylim=(yMin, yMax)))
 ax.grid()
 
-m = np.mean(data)
-m = [m for val in data]
-
-ax.plot(data, '-o')
-ax.plot(m, '-.')
+ax.plot(t, j1, '-')
+ax.plot(t, j2, '-')
+ax.set_xscale('log')
 
 plt.show()

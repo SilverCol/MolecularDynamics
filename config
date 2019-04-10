@@ -8,6 +8,10 @@
 -reads=1000
 -samples=1000
 -steps=20
--step=1
+-step=1.4
 -cutoff=0.0
+
+# Contact flux parameters
+-nTau=1000
+-dtau=.002
 

@@ -356,4 +356,37 @@ void maxwelFlux(double tau, size_t reads, size_t samples, size_t steps, double l
     }
 }
 
+void contactFlux(double itau, double dtau, size_t nTau, size_t samples, size_t steps, double lambda,
+                    std::normal_distribution<double>& tl, std::normal_distribution<double>& tr,
+                    std::vector<double>& target, std::vector<double>& x)
+{
+    double tau = itau;
+    for (size_t i = 0; i < nTau; ++i)
+    {
+        SimplecticS4 integrator(tau / steps, lambda);
+
+        std::cout << "Tau = " << tau << std::endl;
+
+        double j1 = 0;
+        double j2 = 0;
+        for (size_t sample = 0; sample < samples; ++sample)
+        {
+            integrator.propagate(x, steps);
+
+            j1 -= x[N]*x[N];
+            x[N] = tl(generator);
+            j1 += x[N]*x[N];
+
+            j2 -= x[2*N - 1]*x[2*N - 1];
+            x[2 * N - 1] = tr(generator);
+            j2 += x[2*N - 1]*x[2*N - 1];
+        }
+
+        target.push_back(tau);
+        target.push_back(j1/(2*samples*tau));
+        target.push_back(j2/(2*samples*tau));
+        tau += dtau;
+    }
+}
+
 #endif //VAJA_II_2_EXPERIMENTS_HPP
