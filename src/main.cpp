@@ -14,7 +14,7 @@ DEFINE_double(cutoff, 10000., "Initial cutoff.");
 
 DEFINE_string(file, "../data/a.txt", "Path for the output file.");
 
-DEFINE_int32(mode, 0, "Operation mode: 0-TProfile, 1-Flux, 2-MTProfile, 3-MFlux");
+DEFINE_int32(mode, 0, "Operation mode: 0-TProfile, 1-Flux, 2-MTProfile, 3-MFlux, 4-finalTProfileFrame");
 
 int main(int argc, char* argv[])
 {
@@ -59,6 +59,35 @@ int main(int argc, char* argv[])
             x.resize(2*N, 0);
             maxwellInit(x);
             maxwelFlux(FLAGS_step, FLAGS_reads, FLAGS_samples, FLAGS_steps, FLAGS_lambda, tl, tr, output, x);
+            break;
+        case 4: // final T profile frame
+            std::cout << "Calculating final T profile frame" << std::endl;
+            FLAGS_file.append(std::to_string(N));
+            x.resize(2*N + 2, 0);
+            stateInit(x);
+            makeProfile(FLAGS_step * FLAGS_samples, FLAGS_reads, params, output, x, FLAGS_cutoff);
+            break;
+        case 5: // final flux frame mode
+            std::cout << "Calculating final flux frame" << std::endl;
+            FLAGS_file.append(std::to_string(N));
+            x.resize(2*N + 2, 0);
+            stateInit(x);
+            flux(FLAGS_step * FLAGS_samples, FLAGS_reads, params, output, x);
+            break;
+        case 6: // final maxwell T profile frame mode
+            std::cout << "Calculating T profile (maxwell)" << std::endl;
+            FLAGS_file.append(std::to_string(N));
+            x.resize(2*N, 0);
+            maxwellInit(x);
+            maxwelProfile(FLAGS_step, FLAGS_reads, FLAGS_samples, FLAGS_steps, FLAGS_lambda, tl, tr, output, x,
+                    FLAGS_cutoff);
+            break;
+        case 7: // final maxwell flux frame mode
+            std::cout << "Calculating flux (maxwell)" << std::endl;
+            FLAGS_file.append(std::to_string(N));
+            x.resize(2*N, 0);
+            maxwellInit(x);
+            fluxMax(FLAGS_step, FLAGS_reads, FLAGS_samples, FLAGS_steps, FLAGS_lambda, tl, tr, output, x);
             break;
         default:
             std::cerr << "Invalid mode." << std::endl;
