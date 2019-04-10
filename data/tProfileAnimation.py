@@ -52,8 +52,8 @@ for entry in data:
     t.append(entry)
 
 fig = plt.figure()
-yMax = myMax(T)
-yMin = myMin(T)
+yMax = 2.1
+yMin = 0.9
 xMin = 0
 xMax = len(T[0]) - 1
 ax = fig.subplots(subplot_kw=dict(aspect='auto', autoscale_on=False, xlim=(xMin, xMax), ylim=(yMin, yMax)))

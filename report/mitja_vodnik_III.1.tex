@@ -31,6 +31,7 @@
 \newcommand{\bra}[1]{\langle#1|}
 \newcommand{\ket}[1]{|#1\rangle}
 \newcommand{\id}[1]{\mathbf{1}_{2^{#1}}}
+\newcommand{\tinv}{\frac{1}{\tau}}
 
 \begin{document}
 
@@ -41,11 +42,42 @@
 	\date{\today}
 	\maketitle
 
-    Obravnavamo Heisenbergovo spinsko verigo $N$ spinov $S = \half$, kjer je $N$ sodo naravno število.
-    Uporabljamo izotropen antiferomagneten ($J = -1$) model, z interakcijo le med najbližjimi sosedi:
+    Obravnavamo problem prevajanja toplote v eni dimenziji.
+    Imamo verigo $N$ atomov z enakimi masami ($m = 1$), z medatomskim potencialom $V(q_{j+1} - q_j)$ in s potencialom
+    $U(q_j)$, ki vsak atom veže na periodičen substrat.
+    Poleg tega, sta prvi in zadnji delec potopljena v različna termostata s temperaturama $T_L$ in $T_R$.
+    Celotno Hamiltonsko funkcijo verige zapišemo kot:
 
     \begin{equation}\label{eq1}
-        H = \sum_{j=1}^{N} \pauli_j \cdot \pauli_{j+1}
+        H = \half \sum_{j=1}^{N} p_j^2 + \sum_{j=1}^N U(q_j) + \sum_{j=1}^{N-1} V(q_{j+1} - q_j)
+    \end{equation}
+
+    Konkretno nas zanima transport toplote v verigi kvartičnih osclilatorjev, kjer potenciala zapišemo kot:
+
+    \begin{equation}\label{eq2}
+        V(x) = \half x^2, \quad U(x) = \half x^2 + \lambda x^4
+    \end{equation}
+
+    Termostata na konceh verige upoštevamo z dvema različnima modeloma toplotnih kopeli: Nose-Hooverjevim in Maxwellovim.
+
+    \section{Nose-Hooverjev model}
+
+    To je determinističen model toplotnih kopeli in sestoji iz naslednjega sistema enačb (za $j = 1, \ldots, N$):
+
+    \begin{equation}\label{eq3}
+        \begin{split}
+            \der{q_j}{t} &= p_j\\
+            \der{p_j}{t} &= -\pder{V(\q)}{q_j} - \delta_{j,1}\zeta_L p_1 - \delta_{j,N}\zeta_R p_N\\
+            \der{\zeta_L}{t} &= \tinv \left( p_1^2 - T_L \right)\\
+            \der{\zeta_R}{t} &= \tinv \left( p_N^2 - T_R \right)
+        \end{split}
+    \end{equation}
+
+    Tu so $q_j$ in $p_j$ posplošene koordinate in impulzi delcev, $\zeta_L$ in $\zeta_R$ pa eksterni spremenljivki, ki
+    delce vežeta s termostatoma. $V(\q)$ v tem sistemu prestavlja celoten potencial, torej:
+
+    \begin{equation}\label{eq4}
+        V(\q) = \half \sum_{j=1}^N q_j^2 + \lambda \sum_{j=1}^N q_j^4 + \half \sum_{j=1}^{N-1} (q_{j+1} - q_j)^2
     \end{equation}
 
     \iffalse

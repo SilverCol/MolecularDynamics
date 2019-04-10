@@ -1,12 +1,13 @@
 # System parameters
--relax=33.3
--tl=1.0
--tr=2.0
--lambda=1.0
+-relax=1
+-tl=2.0
+-tr=1.0
+-lambda=0.0
 
 # Propagation parameters
 -reads=1000
--samples=10000
--steps=1
--step=.03
+-samples=1000
+-steps=20
+-step=1
+-cutoff=100000.0
 

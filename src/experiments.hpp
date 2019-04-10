@@ -17,7 +17,8 @@
 
 static long seed = std::chrono::system_clock::now().time_since_epoch().count();
 static std::default_random_engine generator (seed);
-static std::normal_distribution<double> distribution (0.0,1.0);
+static std::normal_distribution<double> distribution (0.0,.25);
+static std::normal_distribution<double> distribution2 (0.0,0.125);
 
 static const size_t N = 10;
 static const double binDelimiter = -1234567891.0;
@@ -61,6 +62,10 @@ int systemFunc(double t, const double y[], double f[], void * params)
 
 void stateInit(std::vector<double>& x)
 {
+    for (size_t j = 0; j < x.size()/2 - 1; ++j)
+    {
+        x[j] = distribution2(generator);
+    }
     for (size_t j = x.size()/2; j < x.size()-1; ++j)
     {
         x[j] = distribution(generator);
@@ -69,19 +74,30 @@ void stateInit(std::vector<double>& x)
 
 void maxwellInit(std::vector<double>& x)
 {
+    for (size_t j = 0; j < x.size()/2; ++j)
+    {
+        x[j] = distribution2(generator);
+    }
     for (size_t j = x.size()/2; j < x.size(); ++j)
     {
         x[j] = distribution(generator);
     }
 }
 
-// TODO there must be a bug in here
-void makeTProfile(double step, size_t steps, double *params, std::vector<double>& target, std::vector<double>& x)
+void makeTProfile(double step, size_t steps, double *params, std::vector<double>& target, std::vector<double>& x,
+                  double cutoff)
 {
     gsl_odeiv2_system sys = {systemFunc, nullptr, x.size(), params};
     gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, 1e-6, 0.0, 1e-3);
 
     double t = 0;
+    std::cout << "Cutting the front end: " << cutoff << std::endl;
+    int status = gsl_odeiv2_driver_apply (d, &t, cutoff, x.data());
+    if (status != GSL_SUCCESS)
+    {
+        std::cerr << "error, return value=" << status << std::endl;
+    }
+    t = 0;
 
     std::vector<double> accumulate(N, 0);
 
@@ -97,7 +113,7 @@ void makeTProfile(double step, size_t steps, double *params, std::vector<double>
 
         target.push_back(t);
         std::transform(accumulate.begin(), accumulate.end(), x.begin() + N + 1, accumulate.begin(),
-                       [](double acc, double x){return acc + x*x/2;});
+                       [](double acc, double x){return acc + x*x;});
         std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
                 [t, step](double x){return step*x/t;});
         target.push_back(binDelimiter);
@@ -148,11 +164,14 @@ void makeFlux(double step, size_t steps, double *params, std::vector<double>& ta
 
 void maxwelTProfile(double tau, size_t reads, size_t samples, size_t steps, double lambda,
                     std::normal_distribution<double>& tl, std::normal_distribution<double>& tr,
-                    std::vector<double>& target, std::vector<double>& x)
+                    std::vector<double>& target, std::vector<double>& x, double cutoff)
 {
     SimplecticS4 integrator(tau / steps, lambda);
 
     double time = 0;
+    std::cout << "Cutting the front end: " << cutoff << std::endl;
+    integrator.propagate(x, steps*(size_t)(cutoff/tau));
+
     double readStep = tau * samples;
     std::vector<double> accumulate(N, 0);
 
@@ -172,7 +191,7 @@ void maxwelTProfile(double tau, size_t reads, size_t samples, size_t steps, doub
         target.push_back(time);
 
         std::transform(accumulate.begin(), accumulate.end(), x.begin() + N, accumulate.begin(),
-                       [](double acc, double x){return acc + x*x/2;});
+                       [](double acc, double x){return acc + x*x;});
         std::transform(accumulate.begin(), accumulate.end(), std::back_inserter(target),
                        [time, readStep](double x){return readStep*x/time;});
 
