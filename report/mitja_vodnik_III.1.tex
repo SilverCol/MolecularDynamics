@@ -86,12 +86,32 @@
     \section{Maxwellov model}
 
     Za razliko od prejšnjega, je ta model toplotnih kopeli stohastičen.
+    Algoritem je naslednji:
+
+    \begin{enumerate}
+        \item Izberemo čas vzorčenja $\tau > 0$.
+        \item Med časi $(n - 1)\tau$ in $n\tau$ dinamiko verige simuliramo s simplektičnim integratorjem za Hamiltonov
+        operator \ref{eq1}.
+        Ob časih $n\tau$ resetiramo momente $p_k$ delcev, ki so sklopljeni s kopelmi pri temperaturah $T_k$, tako da
+        jih izžrebamo po porazdelitvi:
+        \begin{equation}\label{eq5}
+            W(p_k) = \frac{1}{\sqrt{2\pi}\sigma_k} exp\left( -\frac{p_k^2}{2\sigma_k^2} \right),
+            \quad \sigma_k = \sqrt{T_k}
+        \end{equation}
+    \end{enumerate}
+
+    Parameter $\tau$ mora  biti  izbran  primerno,  da  bodo  kontakti  s  koplemi  karnajmočnejši, sicer dobimo t.i.
+    kontaktne upornosti.
+
+    \section{Temperaturni profil}
+
+    \ldots
 
     \iffalse
     \begin{figure}
         \centering
         \includegraphics[width = \textwidth]{slika1.pdf}
-        \caption{Avtokorelacijska funkcija spinskega toka.}
+        \caption{\ldots}
         \label{slika1}
     \end{figure}
     \fi

@@ -19,7 +19,7 @@ static long seed = std::chrono::system_clock::now().time_since_epoch().count();
 static std::default_random_engine generator (seed);
 static std::normal_distribution<double> distribution (0.0,1.225);
 
-static const size_t N = 10;
+static const size_t N = 20;
 static const double binDelimiter = -1234567891.0;
 
 void writeBinary(std::vector<double>& data, const std::string& file)
@@ -165,7 +165,7 @@ void maxwellFluxes (const std::vector<double>& y, std::vector<double>& target)
 void flux(double step, size_t steps, double *params, std::vector<double>& target, std::vector<double>& x)
 {
     gsl_odeiv2_system sys = {systemFunc, nullptr, x.size(), params};
-    gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, 1e-6, 0.0, 1e-3);
+    gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, 1e-6, 0.0, 1e-2);
 
     double t = 0;
 
