@@ -45,7 +45,8 @@
     Obravnavamo problem prevajanja toplote v eni dimenziji.
     Imamo verigo $N$ atomov z enakimi masami ($m = 1$), z medatomskim potencialom $V(q_{j+1} - q_j)$ in s potencialom
     $U(q_j)$, ki vsak atom veže na periodičen substrat.
-    Poleg tega, sta prvi in zadnji delec potopljena v različna termostata s temperaturama $T_L$ in $T_R$.
+    Poleg tega, sta prvi in zadnji delec potopljena v različna termostata s temperaturama $T_L$ na levi in $T_R$ na
+    desni strani verige.
     Celotno Hamiltonsko funkcijo verige zapišemo kot:
 
     \begin{equation}\label{eq1}
@@ -59,6 +60,7 @@
     \end{equation}
 
     Termostata na konceh verige upoštevamo z dvema različnima modeloma toplotnih kopeli: Nose-Hooverjevim in Maxwellovim.
+    Pri računanju bomo temperaturi termostatov vedno postavili na $T_L = 2$ in $T_R = 1$.
 
     \section{Nose-Hooverjev model}
 
@@ -100,21 +102,108 @@
         \end{equation}
     \end{enumerate}
 
-    Parameter $\tau$ mora  biti  izbran  primerno,  da  bodo  kontakti  s  koplemi  karnajmočnejši, sicer dobimo t.i.
+    Parameter $\tau$ mora  biti  izbran  primerno,  da  bodo  kontakti  s  koplemi  kar najmočnejši, sicer dobimo t.i.
     kontaktne upornosti.
 
     \section{Temperaturni profil}
 
-    \ldots
+    Oglejmo si profil efektivne temperature:
 
-    \iffalse
+    \begin{equation}\label{eq6}
+        T_j = \langle p_j^2 \rangle = \frac{1}{t} \int_0^t p_j(t') dt'
+    \end{equation}
+
+    Računamo ga v dveh režimih: harmonskem ($\lambda = 0$) in anharmonskem ($\lambda = 1$).
+    V harmonskem režimu pričakujemo konstanten temperaturni profil: $\langle p_j^2 \rangle = \frac{T_L + T_R}{2}$, v
+    anharmonskem pa linearnega: $\langle p_j^2 \rangle \simeq T_L + \frac{j - 1}{N - 1}(T_R - T_L)$. \\
+
+    Na slikah \ref{slika1} in \ref{slika3} sta temperaturna profila harmonske verige izračunana z različnima modeloma
+    termostatov.
+    Oba se približno držita pričakovane konstante.
+    Na slikah \ref{slika2} in \ref{slika4} pa se približno kažeta pričakovana linearna temperaturna profila.
+
+
     \begin{figure}
         \centering
-        \includegraphics[width = \textwidth]{slika1.pdf}
-        \caption{\ldots}
-        \label{slika1}
+        \begin{subfigure}{\textwidth}
+            \includegraphics[width = \textwidth]{slika3.pdf}
+            \caption{Harmonska veriga: $\lambda = 0$.
+            Oranžna črta označuje povprečno vrednost vmesnih vrednosti.}
+            \label{slika1}
+        \end{subfigure}
+        \begin{subfigure}{\textwidth}
+            \includegraphics[width = \textwidth]{slika10.pdf}
+            \caption{Anharmonska veriga: $\lambda = 1$}
+            \label{slika2}
+        \end{subfigure}
+        \caption{Temperaturna profila za harmonsko in anharmonsko verigo dolžine $N = 40$ povprečena po času $t = 10^6$.
+        Uporabljen je bil Nose-Hooverjev termostat.}
     \end{figure}
-    \fi
 
+    \begin{figure}
+        \centering
+        \begin{subfigure}{\textwidth}
+            \includegraphics[width = \textwidth]{slika7.pdf}
+            \caption{Harmonska veriga: $\lambda = 0$.
+            Oranžna črta označuje povprečno vrednost vmesnih vrednosti.}
+            \label{slika3}
+        \end{subfigure}
+        \begin{subfigure}{\textwidth}
+            \includegraphics[width = \textwidth]{slika14.pdf}
+            \caption{Anharmonska veriga: $\lambda = 1$}
+            \label{slika4}
+        \end{subfigure}
+        \caption{Temperaturna profila za harmonsko in anharmonsko verigo dolžine $N = 80$ povprečena po času $t = 10^6$.
+        Uporabljen je bil Maxwellov termostat.}
+    \end{figure}
+
+    \section{Energijski tok}
+
+    Energijski tok na mestu $j$ znotraj verige dobimo kot:
+
+    \begin{equation}\label{eq7}
+        \langle J_j \rangle = -\half \left( V'(q_j - q_{j - 1}) + V'(q_{j + 1} - q_j) \right)p_j
+        = \half (q_{j - 1} - q_{j + 1})p_j
+    \end{equation}
+
+    Za anharmonsko verigo pričakujemo transport energije, ki ga narekuje Fourijerjev zakon:
+
+    \begin{equation}\label{eq8}
+        \langle J_j \rangle \simeq \kappa \frac{T_R - T_L}{N},
+    \end{equation}
+
+    kjer je $\kappa$ konstanta toplotne prevodnosti.
+    Približno ustrezanje temu zakonu je prikazano na sliki \ref{slika5}.
+    Vidimo, da se konstanti za različna modela termostatov razlikujeta za približno faktor $2$.
+
+    \begin{figure}
+        \centering
+        \includegraphics[width = \textwidth]{slika15.pdf}
+        \caption{Energijski tokovi in konstanti toplotne prevodnosti za različna tipa termostatov.
+        Tokovi so računani pri dolžinah $N = 10, 20, 40$ in anharmonski konstanti $\lambda = 1$, ter povprečeni po času
+        $t = 10^6$.
+        Na rezultate je prilagojena premica $\langle p_j \rangle = \frac{\kappa}{N}$.}
+        \label{slika5}
+    \end{figure}
+
+    Izračunajmo še toplotna tokova med verigo in termostatoma:
+
+    \begin{equation}\label{eq9}
+        J = \lim_{N \to \infty} \frac{1}{N\tau} \sum_{n = 1}^N \half \{ p_k^2(t=n\tau + 0) - p_k^2(t=n\tau - 0) \},
+    \end{equation}
+
+    kjer je $p_k$ impulz delca sklopljenega s termostatom, zapis $t = n\tau \pm 0$ pa pomeni, da izvrednotimo tik pred
+    oziroma po žrebanju nove vrednosti momenta v Maxwellovem algoritmu.
+    Odvisnost tako dobljenega toka med termostatoma in verigo od vrednosti vzorčnega časa $\tau$ (slika \ref{slika6}) nam
+    pomaga pri pravilni izbiri vzorčnega časa - želimo si čim manjše kontaktne upornosti oz. čim večjega toka.
+
+    \begin{figure}
+        \centering
+        \includegraphics[width = \textwidth]{slika16.pdf}
+        \caption{Odvisnost toka $J$ med termostatom in verigo v odvisnosti od časa vzorčenja $\tau$.
+        Računano je na anharmonski ($\lambda = 1$) verigi dolžine $N = 10$ in povprečeno po $1000$ vzorcih.
+        $J_1$ se nanaša na tok na levi, $J_2$ pa na desni strani verige.}
+        \label{slika6}
+    \end{figure}
 
 \end{document}

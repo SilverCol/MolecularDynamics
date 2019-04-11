@@ -19,7 +19,7 @@ static long seed = std::chrono::system_clock::now().time_since_epoch().count();
 static std::default_random_engine generator (seed);
 static std::normal_distribution<double> distribution (0.0,1.225);
 
-static const size_t N = 20;
+static const size_t N = 80;
 static const double binDelimiter = -1234567891.0;
 
 void writeBinary(std::vector<double>& data, const std::string& file)

@@ -16,6 +16,7 @@ file += '.bin'
 
 data = np.fromfile(file)
 
+plt.rcParams.update({'font.size': 20})
 fig = plt.figure()
 yMax = 2.1
 yMin = .9
@@ -28,8 +29,13 @@ ax.grid()
 ax.plot(data, '-o')
 
 if txt != 'y':
-    m = np.mean(data)
-    m = [m for val in data]
-    ax.plot(m, '-.')
+    mn = np.mean(data[1:len(data)-1])
+    dev = np.std(data[1:len(data)-1])
+    m = [mn for val in data]
+    line, = ax.plot(m, '-.')
+    ax.legend((line,), ('$%.2f \\pm %.2f$' % (mn, dev),))
+
+ax.set_ylabel('$\\langle p_j \\rangle$')
+ax.set_xlabel('$j$')
 
 plt.show()

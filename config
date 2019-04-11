@@ -7,11 +7,11 @@
 # Propagation parameters
 -reads=1000
 -samples=1000
--steps=67
--step=2.0
+-steps=30
+-step=1
 -cutoff=0.0
 
 # Contact flux parameters
 -nTau=1000
--dtau=.002
+-dtau=.01
 

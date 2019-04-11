@@ -24,16 +24,20 @@ for n, entry in enumerate(data):
     elif stage == 2:
         j2.append(entry)
 
+plt.rcParams.update({'font.size': 20})
 fig = plt.figure()
-yMax = .25
-yMin = -.25
+yMax = .1
+yMin = -.05
 xMin = min(t)
 xMax = max(t)
 ax = fig.subplots(subplot_kw=dict(aspect='auto', autoscale_on=False, xlim=(xMin, xMax), ylim=(yMin, yMax)))
 ax.grid()
 
-ax.plot(t, j1, '-')
-ax.plot(t, j2, '-')
+line1, = ax.plot(t, j1, '-')
+line2, = ax.plot(t, j2, '-')
 ax.set_xscale('log')
+ax.set_ylabel('$J$')
+ax.set_xlabel('$\\tau$')
+ax.legend((line1, line2), ('$J_1$', '$J_N$'))
 
 plt.show()
